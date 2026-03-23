@@ -22,7 +22,7 @@ A command-line interface for querying Pokemon, Berries, Items, and Moves data fr
 **Using uv:**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jebucaro/PokeCli
 cd pokecli
 uv sync
 uv run pokecli --help
@@ -31,7 +31,7 @@ uv run pokecli --help
 **Using pip:**
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/jebucaro/PokeCli
 cd pokecli
 pip install -e .
 pokecli --help
