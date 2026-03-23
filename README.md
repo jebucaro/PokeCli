@@ -345,3 +345,9 @@ pokecli cache stats
 ## Data Source
 
 All data is fetched from the [PokeAPI](https://pokeapi.co) (`https://pokeapi.co/api/v2`). The PokeAPI is a free, open API and does not require authentication.
+
+---
+
+## Credits
+
+Pokémon and Pokémon character names are trademarks of Nintendo.
