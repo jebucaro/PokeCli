@@ -3,7 +3,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from pokecli.models.pokemon import Pokemon
+from pokecli.models.pokemon import Pokemon, PokemonMoveEntry
 
 TYPE_COLORS: dict[str, str] = {
     "normal": "grey70",
@@ -84,3 +84,31 @@ def render_pokemon(pokemon: Pokemon, console: Console) -> None:
     console.print(Panel(header, expand=False))
     console.print(panel_content)
     console.print(stats_table)
+
+
+def render_pokemon_moves(
+    name: str, moves: list[PokemonMoveEntry], console: Console
+) -> None:
+    table = Table(
+        title=f"{name.capitalize()} — learnable moves ({len(moves)})",
+        show_header=True,
+        header_style="bold",
+        box=None,
+        padding=(0, 1),
+    )
+    table.add_column("Move", style="bold white", width=24)
+    table.add_column("Method", width=12)
+    table.add_column("Level", justify="right", width=6)
+
+    METHOD_COLORS = {
+        "level-up": "green",
+        "machine": "cyan",
+        "tutor": "yellow",
+        "egg": "magenta",
+    }
+    for m in moves:
+        color = METHOD_COLORS.get(m.learn_method, "white")
+        level_str = str(m.level) if m.learn_method == "level-up" else "—"
+        table.add_row(m.name, f"[{color}]{m.learn_method}[/]", level_str)
+
+    console.print(table)
