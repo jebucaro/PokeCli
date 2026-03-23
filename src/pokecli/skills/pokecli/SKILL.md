@@ -1,6 +1,6 @@
 ---
 name: pokecli
-description: Queries Pokémon, Berries, Items, and Moves data from the PokeAPI via the pokecli command-line tool. Use when the user needs to look up Pokémon stats, search for berries or items, explore move details, download Pokémon sprites, or manage the local API cache. Also use when the user mentions "pokecli", "pokedex", "PokeAPI", or asks to browse, compare, or list any Pokémon game data from the terminal.
+description: Queries Pokémon, Berries, Items, and Moves data from the PokeAPI via the pokecli command-line tool. Use when the user needs to look up Pokémon stats, search for berries or items, explore move details, look up moves a Pokémon can learn, download Pokémon sprites, or manage the local API cache. Also use when the user mentions "pokecli", "pokedex", "PokeAPI", or asks to browse, compare, or list any Pokémon game data from the terminal.
 allowed-tools: Bash(pokecli:*)
 ---
 
@@ -36,6 +36,8 @@ pokecli pokemon get bulbasaur --no-cache
 pokecli pokemon list
 pokecli pokemon list --limit 50
 pokecli pokemon list --limit 20 --offset 40
+pokecli pokemon moves charmander
+pokecli pokemon moves 4 --format json
 ```
 
 ### Berry
@@ -120,6 +122,13 @@ pokecli move get pound
 pokecli image download pokemon bulbasaur -o bulbasaur.png
 pokecli image download pokemon charmander -o charmander.png
 pokecli image download pokemon squirtle -o squirtle.png
+```
+
+## Example: Look up moves a Pokémon can learn
+
+```bash
+pokecli pokemon moves pikachu
+pokecli pokemon moves charizard --format json
 ```
 
 ## Troubleshooting

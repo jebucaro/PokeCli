@@ -16,6 +16,20 @@ to interpret or explain specific fields from `pokecli` output.
 | Weight | Weight in hectograms |
 | Base Experience | Experience gained by defeating this Pokémon |
 
+## Pokemon Moves Fields
+
+Returned by `pokecli pokemon moves <name_or_id>`.
+
+| Field | Description |
+|-------|-------------|
+| `name` | Move name (hyphen-separated, e.g. `flamethrower`) |
+| `learn_method` | How the move is learned: `level-up`, `machine`, `tutor`, or `egg` |
+| `level` | Level at which the move is learned (level-up only; `0` for all others) |
+
+Results are deduplicated across all game versions. Each move appears once,
+with the learn method taken from the most recent game version that includes it.
+Sorted: level-up moves first (by level), then machine/tutor/egg alphabetically.
+
 ## Berry Fields
 
 | Field | Description |

@@ -95,6 +95,33 @@ pokecli pokemon get charizard --format json
 pokecli pokemon get bulbasaur --no-cache
 ```
 
+#### `pokemon moves`
+
+List all moves a Pokemon can learn, across all game versions (deduplicated).
+Each move shows how it is learned and the level (for level-up moves).
+
+```
+pokecli pokemon moves <name_or_id> [OPTIONS]
+```
+
+| Argument / Option | Type | Default | Description |
+|-------------------|------|---------|-------------|
+| `name_or_id` | string or int | required | Pokemon name or Pokedex number |
+| `--no-cache` | flag | `False` | Skip local cache and fetch from API |
+| `--format` | string | `table` | Output format: `table` or `json` |
+
+**Learn methods:** `level-up`, `machine`, `tutor`, `egg`
+
+**Examples:**
+
+```bash
+pokecli pokemon moves charmander
+pokecli pokemon moves 25 --format json
+pokecli pokemon moves bulbasaur --no-cache
+```
+
+---
+
 #### `pokemon list`
 
 List Pokemon with pagination.
