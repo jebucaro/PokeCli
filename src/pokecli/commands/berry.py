@@ -3,7 +3,6 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from pokecli.api.client import PokeAPIClient
 from pokecli.cache.store import CacheStore
 from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
 from pokecli.display.berry import render_berry
@@ -18,6 +17,7 @@ err_console = Console(stderr=True)
 
 @app.command()
 def get(
+    ctx: typer.Context,
     name_or_id: str = typer.Argument(..., help="Berry name or ID"),
     no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
     format: str = typer.Option(
@@ -25,7 +25,8 @@ def get(
     ),
 ) -> None:
     """Get detailed information about a Berry."""
-    with CacheStore() as cache, PokeAPIClient() as client:
+    client = ctx.obj["client"]
+    with CacheStore() as cache:
         key = name_or_id.lower()
         data = None if no_cache else cache.get("berry", key)
         if data is None:
@@ -54,15 +55,16 @@ def get(
 
 @app.command(name="list")
 def list_berries(
+    ctx: typer.Context,
     limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help="Number of results"),
     offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help="Pagination offset"),
 ) -> None:
     """List Berries with pagination."""
-    with PokeAPIClient() as client:
-        try:
-            data = client.list_resource("berry", limit, offset)
-        except (httpx.ConnectError, httpx.TimeoutException):
-            err_console.print("[red]Network error: could not reach PokeAPI[/red]")
-            raise typer.Exit(1)
+    client = ctx.obj["client"]
+    try:
+        data = client.list_resource("berry", limit, offset)
+    except (httpx.ConnectError, httpx.TimeoutException):
+        err_console.print("[red]Network error: could not reach PokeAPI[/red]")
+        raise typer.Exit(1)
     result = ListResult.model_validate(data)
     render_list(result, console)

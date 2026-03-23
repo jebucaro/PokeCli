@@ -5,7 +5,6 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from pokecli.api.client import PokeAPIClient
 from pokecli.cache.store import CacheStore
 from pokecli.models.pokemon import Pokemon
 
@@ -26,6 +25,7 @@ SPRITE_VARIANTS = [
 
 @app.command()
 def download(
+    ctx: typer.Context,
     resource: str = typer.Argument(
         ..., help=f"Resource type: {', '.join(SUPPORTED_RESOURCES)}"
     ),
@@ -52,7 +52,8 @@ def download(
         )
         raise typer.Exit(1)
 
-    with CacheStore() as cache, PokeAPIClient() as client:
+    client = ctx.obj["client"]
+    with CacheStore() as cache:
         key = name_or_id.lower()
         data = cache.get(resource, key)
         if data is None:

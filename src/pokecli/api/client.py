@@ -20,7 +20,7 @@ class PokeAPIClient:
         return response.json()
 
     def download_bytes(self, url: str) -> bytes:
-        response = httpx.get(url, follow_redirects=True, timeout=30.0)
+        response = self._client.get(url, follow_redirects=True, timeout=30.0)
         response.raise_for_status()
         return response.content
 
