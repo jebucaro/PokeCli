@@ -1,2 +1,5 @@
+from pokecli.main import app
+
+
 def main() -> None:
-    print("Hello from pokecli!")
+    app()
