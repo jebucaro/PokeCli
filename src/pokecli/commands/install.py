@@ -15,7 +15,12 @@ def install(
     skills: bool = typer.Option(
         False,
         "--skills",
-        help="Install Claude Code skills to ~/.claude/skills/pokecli/",
+        help="Install Claude Code skills (use --local to target the current directory).",
+    ),
+    local: bool = typer.Option(
+        False,
+        "--local",
+        help="Install to .claude/skills/pokecli/ relative to the current directory.",
     ),
 ) -> None:
     """Install pokecli integrations."""
@@ -23,7 +28,8 @@ def install(
         console.print(ctx.get_help())
         raise typer.Exit()
 
-    dest_dir = Path.home() / ".claude" / "skills" / "pokecli"
+    base = Path.cwd() if local else Path.home()
+    dest_dir = base / ".claude" / "skills" / "pokecli"
     dest_dir.mkdir(parents=True, exist_ok=True)
 
     skill_pkg = importlib.resources.files("pokecli.skills.pokecli")
