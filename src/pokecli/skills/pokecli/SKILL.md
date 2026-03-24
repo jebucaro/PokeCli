@@ -1,6 +1,6 @@
 ---
 name: pokecli
-description: Queries Pokémon, Berries, Items, and Moves data from the PokeAPI via the pokecli command-line tool. Use when the user needs to look up Pokémon stats, search for berries or items, explore move details, look up moves a Pokémon can learn, download Pokémon sprites, or manage the local API cache. Also use when the user mentions "pokecli", "pokedex", "PokeAPI", or asks to browse, compare, or list any Pokémon game data from the terminal.
+description: Queries Pokémon, Berries, Items, and Moves data via the pokecli CLI. Use when the user needs to look up Pokémon stats, berries, items, or moves, download sprites, or manage the local cache. Also use when the user mentions "pokecli", "pokedex", or "PokeAPI"
 allowed-tools: Bash(pokecli:*)
 ---
 
