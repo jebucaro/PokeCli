@@ -31,7 +31,7 @@ STAT_BAR_MAX = 255
 
 def _stat_bar(value: int, width: int = 20) -> str:
     filled = round(value / STAT_BAR_MAX * width)
-    return "█" * filled + "░" * (width - filled)
+    return "#" * filled + "." * (width - filled)
 
 
 def render_pokemon(pokemon: Pokemon, console: Console) -> None:
@@ -74,11 +74,14 @@ def render_pokemon(pokemon: Pokemon, console: Console) -> None:
     # Sprites
     sprites = pokemon.sprites
     sprite_url = sprites.front_default or "(no sprite)"
+    sprite_line = (
+        f"[bold]Sprite:[/bold] [link={sprite_url}]{sprite_url}[/link]"
+        if console.is_terminal
+        else f"[bold]Sprite:[/bold] {sprite_url}"
+    )
 
     panel_content = (
-        f"{types_line}\n\n"
-        f"[bold]Abilities:[/bold] {abilities_line}\n\n"
-        f"[bold]Sprite:[/bold] [link={sprite_url}]{sprite_url}[/link]\n\n"
+        f"{types_line}\n\n[bold]Abilities:[/bold] {abilities_line}\n\n{sprite_line}\n\n"
     )
 
     console.print(Panel(header, expand=False))
