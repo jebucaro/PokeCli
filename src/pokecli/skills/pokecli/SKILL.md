@@ -38,6 +38,10 @@ pokecli pokemon list --limit 50
 pokecli pokemon list --limit 20 --offset 40
 pokecli pokemon moves charmander
 pokecli pokemon moves 4 --format json
+pokecli pokemon moves pikachu --move thunderbolt
+pokecli pokemon moves pikachu --move thunderbolt --format json
+pokecli pokemon moves eevee --method egg
+pokecli pokemon moves charizard --method level-up
 ```
 
 ### Berry
@@ -102,6 +106,13 @@ pokecli cache clear --resource item
 | `--format table` | Rich formatted table output (default) |
 | `--format json` | Raw JSON with syntax highlighting |
 
+## `pokemon moves` options
+
+| Option | Description |
+|--------|-------------|
+| `--move <name>` | Filter to a specific move; exits 1 if the Pokémon cannot learn it |
+| `--method <method>` | Filter by learn method: `level-up`, `machine`, `tutor`, `egg` |
+
 ## Example: Compare two Pokémon
 
 ```bash
@@ -127,9 +138,21 @@ pokecli image download pokemon squirtle -o squirtle.png
 ## Example: Look up moves a Pokémon can learn
 
 ```bash
+# All moves with summary footer
 pokecli pokemon moves pikachu
-pokecli pokemon moves charizard --format json
+
+# Check if a Pokémon can learn a specific move (table)
+pokecli pokemon moves pikachu --move thunderbolt
+
+# Agent-friendly: returns {"can_learn": true/false, "method": "...", "level": N}
+pokecli pokemon moves pikachu --move thunderbolt --format json
+
+# Filter by learn method: level-up, machine, tutor, egg
+pokecli pokemon moves eevee --method egg
+pokecli pokemon moves charizard --method level-up --format json
 ```
+
+**`--move` exit codes:** `0` if the Pokémon can learn the move, `1` if it cannot.
 
 ## Troubleshooting
 
