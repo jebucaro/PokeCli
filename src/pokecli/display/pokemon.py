@@ -1,3 +1,6 @@
+import os
+import sys
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -29,8 +32,10 @@ TYPE_COLORS: dict[str, str] = {
 STAT_BAR_MAX = 255
 
 
-def _stat_bar(value: int, width: int = 20) -> str:
+def _stat_bar(value: int, width: int = 20, *, unicode: bool = True) -> str:
     filled = round(value / STAT_BAR_MAX * width)
+    if unicode:
+        return "\u2588" * filled + "\u2591" * (width - filled)
     return "#" * filled + "." * (width - filled)
 
 
@@ -53,13 +58,18 @@ def render_pokemon(pokemon: Pokemon, console: Console) -> None:
         type_badges.append(f"[bold {color}] {pt.type.name.upper()} [/]")
     types_line = "  ".join(type_badges)
 
+    _uses_unicode = console.encoding.lower() == "utf-8"
+    _supports_hyperlinks = console.is_terminal and (
+        sys.platform != "win32" or bool(os.environ.get("WT_SESSION"))
+    )
+
     # Stats table
     stats_table = Table(show_header=True, header_style="bold", box=None, padding=(0, 1))
     stats_table.add_column("Stat", style="dim", width=14)
     stats_table.add_column("Base", justify="right", width=4)
     stats_table.add_column("Bar", width=22)
     for ps in pokemon.stats:
-        bar = _stat_bar(ps.base_stat)
+        bar = _stat_bar(ps.base_stat, unicode=_uses_unicode)
         stats_table.add_row(ps.stat.name, str(ps.base_stat), f"[green]{bar}[/]")
 
     # Abilities
@@ -76,7 +86,7 @@ def render_pokemon(pokemon: Pokemon, console: Console) -> None:
     sprite_url = sprites.front_default or "(no sprite)"
     sprite_line = (
         f"[bold]Sprite:[/bold] [link={sprite_url}]{sprite_url}[/link]"
-        if console.is_terminal
+        if _supports_hyperlinks
         else f"[bold]Sprite:[/bold] {sprite_url}"
     )
 
