@@ -31,7 +31,7 @@ def get(
         err_console.print(f"[red]Unexpected API response format:[/red]\n{e}")
         raise typer.Exit(2)
     if format == "json":
-        render_json(data, console)
+        render_json(move.model_dump(), console)
     else:
         render_move(move, console)
 
