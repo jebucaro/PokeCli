@@ -30,6 +30,84 @@ Results are deduplicated across all game versions. Each move appears once,
 with the learn method taken from the most recent game version that includes it.
 Sorted: level-up moves first (by level), then machine/tutor/egg alphabetically.
 
+## Ability Fields
+
+Returned by `pokecli ability get <name_or_id>`.
+
+| Field | Description |
+|-------|-------------|
+| Name | Ability name (hyphen-separated, e.g. `speed-boost`) |
+| ID | Ability identifier |
+| Generation | Generation in which the ability was introduced |
+| Pokemon with this ability | Count of Pokémon that can have this ability |
+| Effect | Short mechanical effect summary |
+| Full Effect | Detailed description including edge cases |
+
+## Nature Fields
+
+Returned by `pokecli nature get <name_or_id>`.
+
+| Field | Description |
+|-------|-------------|
+| Name | Nature name |
+| ID | Nature identifier |
+| Stat Modifier | Which stat is boosted +10% and which is reduced -10% (or "Neutral" if no change) |
+| Likes Flavor | Berry flavor this nature prefers |
+| Hates Flavor | Berry flavor this nature dislikes |
+
+There are 25 natures. 5 are neutral (no stat change). The remaining 20 each boost one stat and drop another.
+
+## Type Fields
+
+Returned by `pokecli type get <name_or_id>`.
+
+| Field | Description |
+|-------|-------------|
+| Name | Type name (e.g. `fire`, `dragon`) |
+| ID | Type identifier |
+| Pokemon | Count of Pokémon with this type |
+| Moves | Count of moves of this type |
+| Super effective → | Types this deals 2× damage to (attacking) |
+| Not very effective → | Types this deals 0.5× damage to (attacking) |
+| No effect → | Types this deals 0× damage to (attacking) |
+| Weak to ← | Types that deal 2× damage to this type (defending) |
+| Resists ← | Types that deal 0.5× damage to this type (defending) |
+| Immune to ← | Types that deal 0× damage to this type (defending) |
+
+## Pokemon Species Fields
+
+Returned by `pokecli pokemon species <name_or_id>`.
+
+| Field | Description |
+|-------|-------------|
+| Name | Pokémon species name |
+| ID | National Pokédex number |
+| Legendary / Mythical | Flags shown in the header if applicable |
+| Genus | Species descriptor (e.g. "Mouse Pokémon") |
+| Generation | Generation in which the species was introduced |
+| Color | Body color category |
+| Growth Rate | Level-up experience curve (e.g. medium-slow) |
+| Capture Rate | Catch rate out of 255 (higher = easier to catch) |
+| Base Happiness | Starting friendship value |
+| Gender | Male/female percentage ratio, or "Genderless" |
+| Egg Groups | Breeding compatibility groups |
+| Flavor Text | Latest English Pokédex entry with game version |
+
+## Evolution Chain Fields
+
+Returned by `pokecli pokemon evolution <name_or_id>`.
+
+Displayed as a tree. Each node shows the species name and the condition required to evolve from the previous stage.
+
+| Trigger | Example condition shown |
+|---------|------------------------|
+| `level-up` | `level 16`, `happiness 160`, `affection 2`, `knowing <move>`, `at <location>` |
+| `use-item` | `use water-stone`, `use thunder-stone` |
+| `trade` | `trade`, `trade holding metal-coat` |
+| `shed` | `shed (level 20, empty slot, Pokeball)` |
+
+Additional modifiers appended when present: `(day)`, `(night)`, `(rain)`, `(upside-down)`, `holding <item>`.
+
 ## Berry Fields
 
 | Field | Description |
@@ -84,6 +162,10 @@ Sorted: level-up moves first (by level), then machine/tutor/egg alphabetically.
 
 All cached responses are stored at `~/.pokecli/cache.json` using TinyDB.
 Each entry is keyed by resource type and name/ID.
+
+Tracked resource tables: `pokemon`, `berry`, `item`, `move`, `ability`, `nature`, `type`, `pokemon-species`, `evolution-chain`.
+
+All tables are visible in `pokecli cache stats` and can be cleared individually with `pokecli cache clear --resource <table>`.
 
 ## Data Source
 

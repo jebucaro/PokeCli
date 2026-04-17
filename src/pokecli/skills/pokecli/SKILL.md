@@ -1,6 +1,6 @@
 ---
 name: pokecli
-description: Queries Pokémon, Berries, Items, and Moves data via the pokecli CLI. Use when the user needs to look up Pokémon stats, berries, items, or moves, download sprites, or manage the local cache. Also use when the user mentions "pokecli", "pokedex", or "PokeAPI"
+description: Queries Pokémon, Berries, Items, Moves, Abilities, Types, Natures, evolution chains, and species data via the pokecli CLI. Use when the user needs to look up Pokémon stats, type matchups, abilities, natures, evolution chains, berries, items, or moves, download sprites, or manage the local cache. Also use when the user mentions "pokecli", "pokedex", or "PokeAPI"
 allowed-tools: Bash(pokecli:*)
 ---
 
@@ -10,6 +10,9 @@ allowed-tools: Bash(pokecli:*)
 
 ```bash
 pokecli pokemon get pikachu
+pokecli type get fire
+pokecli ability get intimidate
+pokecli nature get modest
 pokecli berry get oran
 pokecli item get master-ball
 pokecli move get thunderbolt
@@ -19,8 +22,10 @@ pokecli move get thunderbolt
 
 1. Query: Use `pokecli <resource> get <name_or_id>` to fetch details
 2. Browse: Use `pokecli <resource> list` to paginate through all entries
-3. Download: Use `pokecli image download pokemon <name> -o <path>` for sprites
-4. Cache: Use `pokecli cache stats` and `pokecli cache clear` to manage local data
+3. Evolve: Use `pokecli pokemon evolution <name>` to see the full evolution chain
+4. Species: Use `pokecli pokemon species <name>` for Pokédex entries, capture rate, egg groups
+5. Download: Use `pokecli image download pokemon <name> -o <path>` for sprites
+6. Cache: Use `pokecli cache stats` and `pokecli cache clear` to manage local data
 
 Responses are cached locally after the first request. Use `--no-cache` to force a fresh fetch.
 
@@ -42,6 +47,40 @@ pokecli pokemon moves pikachu --move thunderbolt
 pokecli pokemon moves pikachu --move thunderbolt --format json
 pokecli pokemon moves eevee --method egg
 pokecli pokemon moves charizard --method level-up
+pokecli pokemon species pikachu
+pokecli pokemon species mewtwo --format json
+pokecli pokemon evolution eevee
+pokecli pokemon evolution bulbasaur --format json
+```
+
+### Ability
+
+```bash
+pokecli ability get intimidate
+pokecli ability get 22
+pokecli ability get levitate --format json
+pokecli ability list
+pokecli ability list --limit 20 --offset 40
+```
+
+### Nature
+
+```bash
+pokecli nature get modest
+pokecli nature get 3
+pokecli nature get jolly --format json
+pokecli nature list
+pokecli nature list --limit 25
+```
+
+### Type
+
+```bash
+pokecli type get fire
+pokecli type get 10
+pokecli type get dragon --format json
+pokecli type get ghost --no-cache
+pokecli type list
 ```
 
 ### Berry
@@ -95,6 +134,11 @@ Sprite variants: `front_default`, `front_shiny`, `back_default`, `back_shiny`, `
 pokecli cache stats
 pokecli cache clear
 pokecli cache clear --resource pokemon
+pokecli cache clear --resource ability
+pokecli cache clear --resource nature
+pokecli cache clear --resource type
+pokecli cache clear --resource pokemon-species
+pokecli cache clear --resource evolution-chain
 pokecli cache clear --resource item
 ```
 
@@ -153,6 +197,57 @@ pokecli pokemon moves charizard --method level-up --format json
 ```
 
 **`--move` exit codes:** `0` if the Pokémon can learn the move, `1` if it cannot.
+
+## Example: Look up type matchups
+
+```bash
+# What is fire weak to? What does it hit super effectively?
+pokecli type get fire
+
+# Full type chart as JSON
+pokecli type get water --format json
+```
+
+## Example: Check a Pokémon's ability details
+
+```bash
+# Get the effect of an ability seen on a Pokémon
+pokecli ability get intimidate
+pokecli ability get levitate
+```
+
+## Example: Find the right nature for competitive play
+
+```bash
+# Which stat does modest boost/drop?
+pokecli nature get modest
+
+# Browse all 25 natures
+pokecli nature list --limit 25
+```
+
+## Example: View a full evolution chain
+
+```bash
+# Branching evolution (Eevee has 8 evolutions)
+pokecli pokemon evolution eevee
+
+# Linear chain
+pokecli pokemon evolution charmander
+
+# Trade evolution
+pokecli pokemon evolution haunter
+```
+
+## Example: Get a Pokémon's Pokédex entry and species data
+
+```bash
+# Capture rate, egg groups, flavor text, gender ratio
+pokecli pokemon species bulbasaur
+
+# Legendary check + habitat
+pokecli pokemon species mewtwo
+```
 
 ## Troubleshooting
 
