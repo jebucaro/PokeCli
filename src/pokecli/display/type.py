@@ -3,7 +3,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from pokecli.display.common import uses_unicode
+from pokecli.display.common import get_chars
 from pokecli.display.pokemon import TYPE_COLORS
 from pokecli.models.type import PokemonType
 
@@ -20,10 +20,10 @@ def _type_list(types: list, *, dash: str) -> str:
 
 
 def render_type(pokemon_type: PokemonType, console: Console) -> None:
-    _uses_unicode = uses_unicode(console)
-    dash = "\u2014" if _uses_unicode else "-"
-    arrow_r = "\u2192" if _uses_unicode else "->"
-    arrow_l = "\u2190" if _uses_unicode else "<-"
+    chars = get_chars(console)
+    dash = chars.dash
+    arrow_r = chars.arrow_r
+    arrow_l = chars.arrow_l
 
     dr = pokemon_type.damage_relations
     type_color = TYPE_COLORS.get(pokemon_type.name, "white")

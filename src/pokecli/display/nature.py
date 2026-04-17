@@ -2,11 +2,12 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
+from pokecli.display.common import panel_title
 from pokecli.models.nature import Nature
 
 
 def render_nature(nature: Nature, console: Console) -> None:
-    header = f"[bold]#{nature.id}  {nature.name.capitalize()} Nature[/bold]"
+    header = panel_title(nature.id, f"{nature.name.capitalize()} Nature")
     console.print(Panel(header, expand=False))
 
     table = Table(show_header=False, box=None, padding=(0, 2))

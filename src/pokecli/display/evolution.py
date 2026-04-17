@@ -2,7 +2,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from pokecli.display.common import uses_unicode
+from pokecli.display.common import get_chars, uses_unicode
 from pokecli.models.evolution import (
     ChainLink,
     EvolutionDetail,
@@ -104,8 +104,8 @@ def render_evolution(chain: EvolutionChain, console: Console) -> None:
 
 
 def render_species(species: PokemonSpecies, console: Console) -> None:
-    _uses_unicode = uses_unicode(console)
-    dash = "\u2014" if _uses_unicode else "-"
+    chars = get_chars(console)
+    dash = chars.dash
 
     header = Text()
     header.append(f"#{species.id}  ", style="dim")
