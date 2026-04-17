@@ -74,7 +74,17 @@ class TestStats:
 
     def test_stats_all_resource_keys_present(self, tmp_cache):
         stats = tmp_cache.stats()
-        assert set(stats.keys()) == {"pokemon", "berry", "item", "move"}
+        assert set(stats.keys()) == {
+            "pokemon",
+            "berry",
+            "item",
+            "move",
+            "ability",
+            "nature",
+            "type",
+            "pokemon-species",
+            "evolution-chain",
+        }
 
 
 class TestContextManager:
