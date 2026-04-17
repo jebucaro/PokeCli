@@ -4,7 +4,17 @@ from tinydb import Query, TinyDB
 
 from pokecli.config import CACHE_DB_PATH
 
-RESOURCE_TABLES = ["pokemon", "berry", "item", "move"]
+RESOURCE_TABLES = [
+    "pokemon",
+    "berry",
+    "item",
+    "move",
+    "ability",
+    "nature",
+    "type",
+    "pokemon-species",
+    "evolution-chain",
+]
 
 
 class CacheStore:

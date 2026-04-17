@@ -19,6 +19,11 @@ class PokeAPIClient:
         response.raise_for_status()
         return response.json()
 
+    def get_resource_by_url(self, url: str) -> dict:
+        response = self._client.get(url)
+        response.raise_for_status()
+        return response.json()
+
     def download_bytes(self, url: str) -> bytes:
         response = self._client.get(url, follow_redirects=True, timeout=30.0)
         response.raise_for_status()

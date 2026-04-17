@@ -1,12 +1,16 @@
+import httpx
 import typer
 from pydantic import ValidationError
 from rich.console import Console
 from typing import Optional
 
+from pokecli.cache.store import CacheStore
 from pokecli.commands._utils import fetch_list, fetch_resource
 from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
 from pokecli.display.common import render_json, render_list
+from pokecli.display.evolution import render_evolution, render_species
 from pokecli.display.pokemon import render_pokemon, render_pokemon_moves
+from pokecli.models.evolution import EvolutionChain, PokemonSpecies
 from pokecli.models.pokemon import Pokemon, PokemonMoveEntry
 
 app = typer.Typer(help="Search and browse Pokemon.")
@@ -126,6 +130,75 @@ def moves(
         )
     else:
         render_pokemon_moves(pokemon_name, pokemon_moves, console, method_filter=method)
+
+
+@app.command()
+def species(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
+    format: str = typer.Option(
+        "table", "--format", help="Output format: table or json"
+    ),
+) -> None:
+    """Get species data for a Pokemon (Pokedex entry, egg groups, capture rate, etc.)."""
+    client = ctx.obj["client"]
+    data = fetch_resource(client, "pokemon-species", name_or_id, no_cache, err_console)
+    try:
+        poke_species = PokemonSpecies.model_validate(data)
+    except ValidationError as e:
+        err_console.print(f"[red]Unexpected API response format:[/red]\n{e}")
+        raise typer.Exit(2)
+    if format == "json":
+        render_json(poke_species.model_dump(), console)
+    else:
+        render_species(poke_species, console)
+
+
+@app.command()
+def evolution(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
+    format: str = typer.Option(
+        "table", "--format", help="Output format: table or json"
+    ),
+) -> None:
+    """Show the full evolution chain for a Pokemon."""
+    client = ctx.obj["client"]
+
+    # Step 1: fetch species to get evolution chain URL
+    species_data = fetch_resource(
+        client, "pokemon-species", name_or_id, no_cache, err_console
+    )
+    chain_url = species_data["evolution_chain"]["url"]
+    chain_id = chain_url.rstrip("/").split("/")[-1]
+
+    # Step 2: fetch evolution chain (with caching)
+    with CacheStore() as cache:
+        key = chain_id
+        chain_data = None if no_cache else cache.get("evolution-chain", key)
+        if chain_data is None:
+            try:
+                chain_data = client.get_resource_by_url(chain_url)
+            except httpx.HTTPStatusError as e:
+                err_console.print(f"[red]API error: {e.response.status_code}[/red]")
+                raise typer.Exit(1)
+            except (httpx.ConnectError, httpx.TimeoutException):
+                err_console.print("[red]Network error: could not reach PokeAPI[/red]")
+                raise typer.Exit(1)
+            cache.set("evolution-chain", key, chain_data)
+
+    try:
+        chain = EvolutionChain.model_validate(chain_data)
+    except ValidationError as e:
+        err_console.print(f"[red]Unexpected API response format:[/red]\n{e}")
+        raise typer.Exit(2)
+
+    if format == "json":
+        render_json(chain.model_dump(), console)
+    else:
+        render_evolution(chain, console)
 
 
 @app.command(name="list")
