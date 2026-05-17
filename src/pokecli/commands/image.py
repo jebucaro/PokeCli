@@ -93,6 +93,11 @@ def download(
             err_console.print(f"[red]Failed to download image: {e}[/red]")
             raise typer.Exit(1)
 
-        output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_bytes(image_bytes)
+        try:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_bytes(image_bytes)
+        except OSError as e:
+            err_console.print(f"[red]Failed to save image to '{output}': {e}[/red]")
+            raise typer.Exit(1)
+
         console.print(f"[green]Saved to:[/green] {output.resolve()}")
