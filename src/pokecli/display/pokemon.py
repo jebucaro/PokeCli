@@ -6,29 +6,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from pokecli.display.common import METHOD_COLORS, get_chars, uses_unicode
+from pokecli.display.common import METHOD_COLORS, TYPE_COLORS, get_chars, uses_unicode
 from pokecli.models.pokemon import Pokemon, PokemonMoveEntry
-
-TYPE_COLORS: dict[str, str] = {
-    "normal": "grey70",
-    "fire": "bright_red",
-    "water": "blue",
-    "electric": "yellow",
-    "grass": "green",
-    "ice": "cyan",
-    "fighting": "red",
-    "poison": "magenta",
-    "ground": "yellow3",
-    "flying": "sky_blue2",
-    "psychic": "hot_pink",
-    "bug": "chartreuse3",
-    "rock": "dark_goldenrod",
-    "ghost": "medium_purple",
-    "dragon": "blue_violet",
-    "dark": "grey39",
-    "steel": "steel_blue",
-    "fairy": "light_pink1",
-}
 
 STAT_BAR_MAX = 255
 

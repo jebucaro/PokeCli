@@ -2,7 +2,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from pokecli.display.common import get_chars, uses_unicode
+from pokecli.display.common import format_name, get_chars, uses_unicode
 from pokecli.models.evolution import (
     ChainLink,
     EvolutionDetail,
@@ -131,16 +131,14 @@ def render_species(species: PokemonSpecies, console: Console) -> None:
 
     # Core info line
     gender_str = _gender_rate(species.gender_rate)
-    egg_groups = ", ".join(
-        eg.name.replace("-", " ").title() for eg in species.egg_groups
-    )
+    egg_groups = ", ".join(format_name(eg.name) for eg in species.egg_groups)
     happiness = (
         str(species.base_happiness) if species.base_happiness is not None else dash
     )
     info = (
-        f"[bold]Generation:[/bold] {species.generation.name.replace('-', ' ').title()}   "
+        f"[bold]Generation:[/bold] {format_name(species.generation.name)}   "
         f"[bold]Color:[/bold] {species.color.name.capitalize()}   "
-        f"[bold]Growth Rate:[/bold] {species.growth_rate.name.replace('-', ' ').title()}\n"
+        f"[bold]Growth Rate:[/bold] {format_name(species.growth_rate.name)}\n"
         f"[bold]Capture Rate:[/bold] {species.capture_rate}   "
         f"[bold]Base Happiness:[/bold] {happiness}   "
         f"[bold]Gender:[/bold] {gender_str}\n"

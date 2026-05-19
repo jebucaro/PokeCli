@@ -9,7 +9,9 @@ from pokecli.commands._utils import fetch_list, fetch_resource
 from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
 from pokecli.display.common import render_json, render_list
 from pokecli.display.evolution import render_evolution, render_species
+from pokecli.display.location import render_encounters
 from pokecli.display.pokemon import render_pokemon, render_pokemon_moves
+from pokecli.display.pokemon_form import render_pokemon_varieties
 from pokecli.models.evolution import EvolutionChain, PokemonSpecies
 from pokecli.models.pokemon import Pokemon, PokemonMoveEntry
 
@@ -199,6 +201,58 @@ def evolution(
         render_json(chain.model_dump(), console)
     else:
         render_evolution(chain, console)
+
+
+@app.command()
+def encounters(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
+    format: str = typer.Option(
+        "table", "--format", help="Output format: table or json"
+    ),
+) -> None:
+    """Show where a Pokemon can be encountered in the wild."""
+    client = ctx.obj["client"]
+    # Resolve identifier to canonical pokemon name (handles ID input)
+    data = fetch_resource(client, "pokemon", name_or_id, False, err_console)
+    pokemon_name = data["name"]
+    try:
+        result = client.get_subresource("pokemon", pokemon_name, "encounters")
+    except httpx.HTTPStatusError as e:
+        err_console.print(f"[red]API error: {e.response.status_code}[/red]")
+        raise typer.Exit(1)
+    except (httpx.ConnectError, httpx.TimeoutException):
+        err_console.print("[red]Network error: could not reach PokeAPI[/red]")
+        raise typer.Exit(1)
+
+    if format == "json":
+        render_json({"pokemon": pokemon_name, "encounters": result}, console)
+    else:
+        render_encounters(pokemon_name, result, console)
+
+
+@app.command()
+def forms(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
+    format: str = typer.Option(
+        "table", "--format", help="Output format: table or json"
+    ),
+) -> None:
+    """List all varieties of a Pokemon species (Mega, Alolan, Gigantamax, etc.)."""
+    client = ctx.obj["client"]
+    species_data = fetch_resource(
+        client, "pokemon-species", name_or_id, no_cache, err_console
+    )
+    species_name = species_data["name"]
+    varieties = species_data.get("varieties", [])
+
+    if format == "json":
+        render_json({"species": species_name, "varieties": varieties}, console)
+        return
+
+    render_pokemon_varieties(species_name, varieties, console)
 
 
 @app.command(name="list")

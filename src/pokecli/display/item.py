@@ -1,14 +1,14 @@
 from rich.console import Console
 from rich.panel import Panel
 
-from pokecli.display.common import get_chars, panel_title
+from pokecli.display.common import format_name, get_chars, panel_title
 from pokecli.models.item import Item
 
 
 def render_item(item: Item, console: Console) -> None:
     chars = get_chars(console)
 
-    header = panel_title(item.id, item.name.replace("-", " ").title())
+    header = panel_title(item.id, format_name(item.name))
     fling = (
         f"   [bold]Fling Power:[/bold] {item.fling_power}" if item.fling_power else ""
     )

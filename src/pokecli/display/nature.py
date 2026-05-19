@@ -1,8 +1,7 @@
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 
-from pokecli.display.common import panel_title
+from pokecli.display.common import create_key_value_table, format_name, panel_title
 from pokecli.models.nature import Nature
 
 
@@ -10,13 +9,11 @@ def render_nature(nature: Nature, console: Console) -> None:
     header = panel_title(nature.id, f"{nature.name.capitalize()} Nature")
     console.print(Panel(header, expand=False))
 
-    table = Table(show_header=False, box=None, padding=(0, 2))
-    table.add_column("Key", style="bold dim")
-    table.add_column("Value", style="white")
+    table = create_key_value_table()
 
     if nature.increased_stat and nature.decreased_stat:
-        increased = nature.increased_stat.name.replace("-", " ").title()
-        decreased = nature.decreased_stat.name.replace("-", " ").title()
+        increased = format_name(nature.increased_stat.name)
+        decreased = format_name(nature.decreased_stat.name)
         table.add_row(
             "Stat Modifier",
             f"[green]+10% {increased}[/green]  [red]-10% {decreased}[/red]",
