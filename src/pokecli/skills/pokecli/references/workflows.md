@@ -13,7 +13,9 @@ pokecli pokemon encounters pikachu
 ```
 
 Returns a table of `location_area`, `version`, `method`, `chance`, and level
-range for every recorded encounter. For agent piping:
+range for every recorded encounter.
+
+Shell scripting variant only (requires `jq`):
 
 ```bash
 pokecli pokemon encounters pikachu --format json
@@ -44,7 +46,7 @@ pokecli location-area get kanto-route-1-area
 # → "Pokemon Encounters" table: pokemon, version, method, chance, levels
 ```
 
-JSON variant for scripting:
+Shell scripting variant only (requires `jq`):
 
 ```bash
 pokecli region get kanto --format json | jq '.locations[].name'
@@ -59,7 +61,7 @@ pokecli generation get generation-i
 # → "Pokemon Species" count + list, "Moves" count + list
 ```
 
-Filter to just the species:
+Shell scripting variant only (requires `jq`) — filter to just the species names:
 
 ```bash
 pokecli generation get generation-iii --format json \
@@ -71,8 +73,11 @@ pokecli generation get generation-iii --format json \
 ```bash
 pokecli pokedex get kanto
 # → "Entries" table with entry numbers + species names
+```
 
-# Just the species, sorted by dex number:
+Shell scripting variant only (requires `jq`) — sorted by dex number:
+
+```bash
 pokecli pokedex get kanto --format json \
   | jq -r '.pokemon_entries[] | "\(.entry_number) \(.pokemon_species.name)"'
 ```
@@ -83,10 +88,20 @@ The `move get` response includes a `machines[]` field listing every
 TM/HM/version-group combination that teaches it.
 
 ```bash
+pokecli move get thunderbolt
+# → table includes a Machines row listing TM/HM entries
+```
+
+Shell scripting variant only (requires `jq`) — extract machine IDs from the URL:
+
+```bash
 pokecli move get thunderbolt --format json | jq '.machines'
 # → [{"machine": {"url": ".../machine/79/"}, "version_group": {"name": "red-blue"}}, ...]
+```
 
-# Pull a machine ID from the URL and inspect:
+Pull a machine ID from the URL and inspect:
+
+```bash
 pokecli machine get 79
 # → Item: tm24, Teaches Move: thunderbolt, Version Group: red-blue
 ```

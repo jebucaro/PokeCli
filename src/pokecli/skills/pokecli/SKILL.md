@@ -344,6 +344,11 @@ Other cacheable resources: `move-damage-class`, `move-learn-method`, `growth-rat
 | `--format table` | Rich formatted table output (default) |
 | `--format json` | Raw JSON with syntax highlighting |
 
+> **For AI agents:** Prefer the default table output — it is plain text you can
+> read directly. Use `--format json` only when you need to pipe the output to
+> `jq` or a shell script. Raw JSON is not easier to process; it requires extra
+> parsing steps that table output avoids entirely.
+
 ## `pokemon moves` options
 
 | Option | Description |
@@ -382,7 +387,7 @@ pokecli pokemon moves pikachu
 # Check if a Pokémon can learn a specific move (table)
 pokecli pokemon moves pikachu --move thunderbolt
 
-# Agent-friendly: returns {"can_learn": true/false, "method": "...", "level": N}
+# Returns {"can_learn": true/false, "method": "...", "level": N} — useful for scripting
 pokecli pokemon moves pikachu --move thunderbolt --format json
 
 # Filter by learn method: level-up, machine, tutor, egg
