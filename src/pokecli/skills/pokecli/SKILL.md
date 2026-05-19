@@ -1,6 +1,6 @@
 ---
 name: pokecli
-description: Queries Pokémon, Berries, Items, Moves, Abilities, Types, Natures, evolution chains, and species data via the pokecli CLI. Use when the user needs to look up Pokémon stats, type matchups, abilities, natures, evolution chains, berries, items, or moves, download sprites, or manage the local cache. Also use when the user mentions "pokecli", "pokedex", or "PokeAPI"
+description: Queries Pokémon, Berries, Items, Moves, Abilities, Types, Natures, evolution chains, species, egg groups, growth rates, machines (TM/HM), Pokemon forms, versions, version groups, regions, locations, location areas, generations, and pokedexes via the pokecli CLI. Use when the user needs to look up Pokémon stats, type matchups, abilities, natures, evolution chains, berries, items, moves, TMs, breeding compatibility, alternative forms, encounter locations, regional pokedexes, generation rosters, game versions, download sprites, or manage the local cache. Also use when the user mentions "pokecli", "pokedex", or "PokeAPI"
 allowed-tools: Bash(pokecli:*)
 ---
 
@@ -29,6 +29,47 @@ pokecli move get thunderbolt
 
 Responses are cached locally after the first request. Use `--no-cache` to force a fresh fetch.
 
+**Uniform contract:** every resource supports `get <name_or_id>` and `list [--limit --offset]` with `--format table|json` and `--no-cache`. The Pokemon resource adds `moves`, `species`, and `evolution` sub-commands because each maps to a different API endpoint.
+
+## Decision tree
+
+Pick the right command for a given user intent. When in doubt, every resource supports `pokecli <resource> get <name_or_id>`.
+
+| User intent                                          | Command                                              |
+|------------------------------------------------------|------------------------------------------------------|
+| Pokemon stats, types, abilities                      | `pokecli pokemon get <name>`                         |
+| Moves a Pokemon can learn                            | `pokecli pokemon moves <name>`                       |
+| Pokedex entry, egg groups, capture rate              | `pokecli pokemon species <name>`                     |
+| Full evolution chain for a Pokemon                   | `pokecli pokemon evolution <name>`                   |
+| Where can I catch this Pokemon?                      | `pokecli pokemon encounters <name>`                  |
+| All varieties/forms (Mega, Alolan, Gmax)             | `pokecli pokemon forms <name>`                       |
+| What does an ability do?                             | `pokecli ability get <name>`                         |
+| What stats does a nature affect?                     | `pokecli nature get <name>`                          |
+| Type matchups (weak/resists/immune)                  | `pokecli type get <name>`                            |
+| Berry profile / item description / move details      | `pokecli {berry,item,move} get <name>`               |
+| What does an egg group mean? (breeding)              | `pokecli egg-group get <name>`                       |
+| What growth rate does X use?                         | `pokecli growth-rate get <name>`                     |
+| What does damage class X mean?                       | `pokecli move-damage-class get <name>`               |
+| What does learn method X mean?                       | `pokecli move-learn-method get <name>`               |
+| What does evolution trigger X mean?                  | `pokecli evolution-trigger get <name>`               |
+| What game is X (e.g. Pokemon Red)?                   | `pokecli version get <name>`                         |
+| What versions belong to group X (e.g. red-blue)?     | `pokecli version-group get <name>`                   |
+| What TM/HM is machine #N?                            | `pokecli machine get <id>`                           |
+| Inspect a specific form/variety                      | `pokecli pokemon-form get <form-name>`               |
+| All locations in a region                            | `pokecli region get <region>` (renders inline)       |
+| What Pokemon live at this location?                  | `pokecli location-area get <area>` (renders inline)  |
+| Sub-areas of a location                              | `pokecli location get <name>` (renders inline)       |
+| Pokemon/moves introduced in Gen N                    | `pokecli generation get <gen>` (renders inline)      |
+| Regional Pokedex listing (entry numbers + species)   | `pokecli pokedex get <name>` (renders inline)        |
+| Evolution chain by chain ID (not by Pokemon name)    | `pokecli evolution-chain get <id>`                   |
+| Download a Pokemon sprite                            | `pokecli image download pokemon <name> -o <path>`    |
+| Any resource not listed above                        | `pokecli <resource> get <name>` — uniform contract   |
+
+## Multi-step workflows
+
+For multi-resource recipes (regional encounter lookup, TM tracing, full Pokemon
+profile assembly, decoding cross-reference fields), see `references/workflows.md`.
+
 ## Commands
 
 ### Pokemon
@@ -51,6 +92,10 @@ pokecli pokemon species pikachu
 pokecli pokemon species mewtwo --format json
 pokecli pokemon evolution eevee
 pokecli pokemon evolution bulbasaur --format json
+pokecli pokemon encounters pikachu
+pokecli pokemon encounters 25 --format json
+pokecli pokemon forms charizard
+pokecli pokemon forms vulpix --format json
 ```
 
 ### Ability
@@ -117,6 +162,150 @@ pokecli move list --limit 40
 pokecli move list --limit 20 --offset 100
 ```
 
+### Egg Group
+
+```bash
+pokecli egg-group get monster
+pokecli egg-group get human-like
+pokecli egg-group get 1 --format json
+pokecli egg-group list
+```
+
+### Growth Rate
+
+```bash
+pokecli growth-rate get medium-slow
+pokecli growth-rate get slow
+pokecli growth-rate get 1 --format json
+pokecli growth-rate list
+```
+
+### Evolution Trigger
+
+```bash
+pokecli evolution-trigger get level-up
+pokecli evolution-trigger get use-item
+pokecli evolution-trigger get 1 --format json
+pokecli evolution-trigger list
+```
+
+### Move Damage Class
+
+```bash
+pokecli move-damage-class get physical
+pokecli move-damage-class get special
+pokecli move-damage-class get status --format json
+pokecli move-damage-class list
+```
+
+### Move Learn Method
+
+```bash
+pokecli move-learn-method get level-up
+pokecli move-learn-method get machine
+pokecli move-learn-method get egg --format json
+pokecli move-learn-method list
+```
+
+### Version
+
+```bash
+pokecli version get red
+pokecli version get sword
+pokecli version get 1 --format json
+pokecli version list
+```
+
+### Version Group
+
+```bash
+pokecli version-group get red-blue
+pokecli version-group get sword-shield
+pokecli version-group get 1 --format json
+pokecli version-group list
+```
+
+### Machine (TM/HM)
+
+```bash
+pokecli machine get 1
+pokecli machine get 100 --format json
+pokecli machine list --limit 50
+```
+
+### Pokemon Form
+
+```bash
+pokecli pokemon-form get charizard-mega-x
+pokecli pokemon-form get vulpix-alola
+pokecli pokemon-form get pikachu-gmax --format json
+pokecli pokemon-form list --limit 50
+```
+
+### Region
+
+```bash
+pokecli region get kanto
+pokecli region get hoenn --format json
+pokecli region list
+```
+
+The `get` output includes the region's full list of child locations inline.
+
+### Location
+
+```bash
+pokecli location get pallet-town
+pokecli location get kanto-route-1
+pokecli location get celadon-city --format json
+pokecli location list --limit 50
+```
+
+The `get` output includes the location's sub-areas inline.
+
+### Location Area
+
+```bash
+pokecli location-area get kanto-route-1-area
+pokecli location-area get trophy-garden-area --format json
+pokecli location-area list --limit 50
+```
+
+The `get` output includes the full Pokemon encounter table for the area
+(pokemon × version × method × chance × levels).
+
+### Generation
+
+```bash
+pokecli generation get generation-i
+pokecli generation get generation-iii --format json
+pokecli generation list
+```
+
+The `get` output includes counts and full lists of Pokemon species and moves
+introduced in that generation.
+
+### Pokedex
+
+```bash
+pokecli pokedex get kanto
+pokecli pokedex get national --format json
+pokecli pokedex list
+```
+
+The `get` output includes the full numbered entries list for the pokedex.
+
+### Evolution Chain
+
+```bash
+pokecli evolution-chain get 67
+pokecli evolution-chain get 1 --format json
+pokecli evolution-chain list --limit 50
+```
+
+Reuses the same tree rendering as `pokecli pokemon evolution`, but accepts a
+chain ID directly (useful when you already have one from another response).
+
 ### Image Download
 
 ```bash
@@ -140,7 +329,12 @@ pokecli cache clear --resource type
 pokecli cache clear --resource pokemon-species
 pokecli cache clear --resource evolution-chain
 pokecli cache clear --resource item
+pokecli cache clear --resource machine
+pokecli cache clear --resource egg-group
+pokecli cache clear --resource version-group
 ```
+
+Other cacheable resources: `move-damage-class`, `move-learn-method`, `growth-rate`, `evolution-trigger`, `version`, `pokemon-form`, `location`, `location-area`, `region`, `generation`, `pokedex`. Run `pokecli cache stats` for the full list.
 
 ## Global options
 
@@ -251,4 +445,6 @@ pokecli pokemon species mewtwo
 
 ## Troubleshooting
 
-For detailed command reference and data field descriptions, consult `references/api-fields.md`.
+For detailed command reference and data field descriptions, consult
+`references/api-fields.md`. For multi-step recipes that chain commands across
+resources, consult `references/workflows.md`.

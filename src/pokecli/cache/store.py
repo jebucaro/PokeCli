@@ -14,6 +14,20 @@ RESOURCE_TABLES = [
     "type",
     "pokemon-species",
     "evolution-chain",
+    "location",
+    "location-area",
+    "region",
+    "generation",
+    "version",
+    "version-group",
+    "pokedex",
+    "machine",
+    "pokemon-form",
+    "egg-group",
+    "growth-rate",
+    "evolution-trigger",
+    "move-damage-class",
+    "move-learn-method",
 ]
 
 

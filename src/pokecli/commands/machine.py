@@ -1,0 +1,47 @@
+import typer
+from pydantic import ValidationError
+from rich.console import Console
+
+from pokecli.commands._utils import fetch_list, fetch_resource
+from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
+from pokecli.display.common import render_json, render_list
+from pokecli.display.machine import render_machine
+from pokecli.models.machine import Machine
+
+app = typer.Typer(help="Search and browse TM/HM Machines.")
+console = Console()
+err_console = Console(stderr=True)
+
+
+@app.command()
+def get(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help="Machine ID"),
+    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
+    format: str = typer.Option(
+        "table", "--format", help="Output format: table or json"
+    ),
+) -> None:
+    """Get details about a TM/HM Machine."""
+    client = ctx.obj["client"]
+    data = fetch_resource(client, "machine", name_or_id, no_cache, err_console)
+    try:
+        machine = Machine.model_validate(data)
+    except ValidationError as e:
+        err_console.print(f"[red]Unexpected API response format:[/red]\n{e}")
+        raise typer.Exit(2)
+    if format == "json":
+        render_json(machine.model_dump(), console)
+    else:
+        render_machine(machine, console)
+
+
+@app.command(name="list")
+def list_machines(
+    ctx: typer.Context,
+    limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help="Number of results"),
+    offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help="Pagination offset"),
+) -> None:
+    """List Machines with pagination."""
+    client = ctx.obj["client"]
+    render_list(fetch_list(client, "machine", limit, offset, err_console), console)

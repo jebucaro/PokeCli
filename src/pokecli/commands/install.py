@@ -39,11 +39,12 @@ def install(
 
     refs_dir = dest_dir / "references"
     refs_dir.mkdir(exist_ok=True)
-    api_fields = (
-        skill_pkg.joinpath("references")
-        .joinpath("api-fields.md")
-        .read_text(encoding="utf-8")
-    )
-    (refs_dir / "api-fields.md").write_text(api_fields, encoding="utf-8")
+    for ref_name in ("api-fields.md", "workflows.md"):
+        content = (
+            skill_pkg.joinpath("references")
+            .joinpath(ref_name)
+            .read_text(encoding="utf-8")
+        )
+        (refs_dir / ref_name).write_text(content, encoding="utf-8")
 
     console.print(f"[green]✓ Skills installed to {dest_dir}[/green]")

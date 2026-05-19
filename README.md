@@ -1,11 +1,12 @@
 # pokecli
 
-A command-line interface for querying Pokemon, Berries, Items, and Moves data from the [PokeAPI](https://pokeapi.co/api/v2). Results are displayed in formatted tables or raw JSON, and responses are cached locally to reduce redundant API calls.
+A command-line interface for querying Pokemon, Berries, Items, Moves, Abilities, Natures, Types, evolution chains, species, locations, regions, generations, pokedexes, machines, forms, and more from the [PokeAPI](https://pokeapi.co/api/v2). Results are displayed in formatted tables or raw JSON, and responses are cached locally to reduce redundant API calls.
 
 ## Features
 
-- Query detailed information about Pokemon, Berries, Items, and Moves by name or ID
-- Paginated listing for all resource types
+- Uniform `get <name_or_id>` and `list` contract across every supported PokeAPI resource
+- Pokemon navigation sub-commands: `moves`, `species`, `evolution`, `encounters`, `forms`
+- Rich parent displays that render child resources inline (`region get` shows locations, `pokedex get` shows entries, `generation get` shows new Pokemon and moves, `location-area get` shows the full encounter table)
 - Download Pokemon sprite images in multiple variants
 - Local response caching with TinyDB to minimize network requests
 - Rich terminal output with color-coded tables and panels
@@ -109,15 +110,52 @@ pokecli pokemon moves <name_or_id> [OPTIONS]
 | `name_or_id` | string or int | required | Pokemon name or Pokedex number |
 | `--no-cache` | flag | `False` | Skip local cache and fetch from API |
 | `--format` | string | `table` | Output format: `table` or `json` |
-
-**Learn methods:** `level-up`, `machine`, `tutor`, `egg`
+| `--move` | string | none | Filter to a specific move (exits 1 if Pokemon cannot learn it) |
+| `--method` | string | none | Filter by learn method: `level-up`, `machine`, `tutor`, `egg` |
 
 **Examples:**
 
 ```bash
 pokecli pokemon moves charmander
 pokecli pokemon moves 25 --format json
-pokecli pokemon moves bulbasaur --no-cache
+pokecli pokemon moves pikachu --move thunderbolt --format json
+pokecli pokemon moves eevee --method egg
+```
+
+#### `pokemon species`
+
+Get species data (Pokedex entry, capture rate, egg groups, gender ratio, flavor text).
+
+```bash
+pokecli pokemon species bulbasaur
+pokecli pokemon species mewtwo --format json
+```
+
+#### `pokemon evolution`
+
+Show the full branching evolution chain for a Pokemon.
+
+```bash
+pokecli pokemon evolution eevee
+pokecli pokemon evolution charmander --format json
+```
+
+#### `pokemon encounters`
+
+Show where a Pokemon can be encountered in the wild — every location area, version, method, chance, and level range.
+
+```bash
+pokecli pokemon encounters pikachu
+pokecli pokemon encounters 25 --format json
+```
+
+#### `pokemon forms`
+
+List all varieties of a Pokemon species (Mega, Alolan, Gigantamax, etc.). Sourced from the species `varieties[]` field.
+
+```bash
+pokecli pokemon forms charizard
+pokecli pokemon forms vulpix --format json
 ```
 
 ---
@@ -289,6 +327,45 @@ pokecli move list [OPTIONS]
 pokecli move list
 pokecli move list --limit 40
 pokecli move list --limit 20 --offset 100
+```
+
+---
+
+### Additional resources (uniform `get` / `list`)
+
+Every resource below follows the same contract: `pokecli <resource> get <name_or_id>` and `pokecli <resource> list [--limit --offset]`, both supporting `--format table|json` and (`get` only) `--no-cache`.
+
+| Command | What it returns |
+|---------|------------------|
+| `pokecli ability get <name>` | Ability effect text, generation, Pokemon count |
+| `pokecli nature get <name>` | Stat boost/drop, liked/hated flavors |
+| `pokecli type get <name>` | Full type matchup chart (weak / resists / immune, attacking and defending) |
+| `pokecli region get <name>` | Region info **with full child locations inline** |
+| `pokecli location get <name>` | Location info **with child areas inline** |
+| `pokecli location-area get <name>` | Area info **with full Pokemon encounter table** |
+| `pokecli generation get <name>` | Generation info **with new Pokemon + moves lists** |
+| `pokecli pokedex get <name>` | Pokedex info **with full numbered entries list** |
+| `pokecli evolution-chain get <id>` | Branching evolution tree by chain ID |
+| `pokecli machine get <id>` | TM/HM lookup: item + move + version-group |
+| `pokemon-form get <name>` | Form details (types, sprites, mega/battle-only flags) |
+| `pokecli egg-group get <name>` | Breeding compatibility group |
+| `pokecli growth-rate get <name>` | XP curve identifier |
+| `pokecli evolution-trigger get <name>` | Trigger meaning (`level-up`, `use-item`, `trade`, etc.) |
+| `pokecli move-damage-class get <name>` | `physical`, `special`, `status` |
+| `pokecli move-learn-method get <name>` | `level-up`, `machine`, `egg`, `tutor`, etc. |
+| `pokecli version get <name>` | Single game version (e.g. `red`, `sword`) |
+| `pokecli version-group get <name>` | Group (e.g. `red-blue`, `sword-shield`) with member versions |
+
+**Examples:**
+
+```bash
+pokecli region get kanto
+pokecli location-area get kanto-route-1-area
+pokecli generation get generation-i
+pokecli pokedex get kanto
+pokecli machine get 1
+pokecli pokemon-form get charizard-mega-x
+pokecli egg-group get monster --format json
 ```
 
 ---
