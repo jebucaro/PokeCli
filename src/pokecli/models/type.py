@@ -1,11 +1,7 @@
-from pydantic import BaseModel, ConfigDict
-
-from pokecli.models.common import NamedResource
+from pokecli.models.common import BasePokeModel, NamedResource
 
 
-class TypeDamageRelations(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class TypeDamageRelations(BasePokeModel):
     no_damage_to: list[NamedResource]
     half_damage_to: list[NamedResource]
     double_damage_to: list[NamedResource]
@@ -14,9 +10,7 @@ class TypeDamageRelations(BaseModel):
     double_damage_from: list[NamedResource]
 
 
-class PokemonType(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class PokemonType(BasePokeModel):
     id: int
     name: str
     damage_relations: TypeDamageRelations

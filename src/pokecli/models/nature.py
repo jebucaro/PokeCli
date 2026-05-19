@@ -1,11 +1,7 @@
-from pydantic import BaseModel, ConfigDict
-
-from pokecli.models.common import NamedResource
+from pokecli.models.common import BasePokeModel, NamedResource
 
 
-class Nature(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class Nature(BasePokeModel):
     id: int
     name: str
     decreased_stat: NamedResource | None = None

@@ -1,13 +1,9 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
-
-from pokecli.models.common import NamedResource
+from pokecli.models.common import BasePokeModel, NamedResource
 
 
-class EvolutionDetail(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class EvolutionDetail(BasePokeModel):
     trigger: NamedResource
     min_level: int | None = None
     item: NamedResource | None = None
@@ -22,24 +18,18 @@ class EvolutionDetail(BaseModel):
     turn_upside_down: bool = False
 
 
-class ChainLink(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class ChainLink(BasePokeModel):
     species: NamedResource
     evolution_details: list[EvolutionDetail]
     evolves_to: list[ChainLink]
 
 
-class EvolutionChain(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class EvolutionChain(BasePokeModel):
     id: int
     chain: ChainLink
 
 
-class PokemonSpecies(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class PokemonSpecies(BasePokeModel):
     id: int
     name: str
     generation: NamedResource

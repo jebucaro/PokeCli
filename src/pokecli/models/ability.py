@@ -1,19 +1,13 @@
-from pydantic import BaseModel, ConfigDict
-
-from pokecli.models.common import NamedResource
+from pokecli.models.common import BasePokeModel, NamedResource
 
 
-class AbilityEffect(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class AbilityEffect(BasePokeModel):
     effect: str
     short_effect: str
     language: NamedResource
 
 
-class Ability(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-
+class Ability(BasePokeModel):
     id: int
     name: str
     generation: NamedResource
