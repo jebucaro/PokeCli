@@ -160,7 +160,7 @@ Additional modifiers appended when present: `(day)`, `(night)`, `(rain)`, `(upsi
 
 ## Egg Group Fields
 
-Returned by `pokecli egg-group get <name_or_id>`.
+Returned by `pokecli pokemon egg-group get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -172,7 +172,7 @@ Egg groups determine breeding compatibility. Two Pokémon can breed if they shar
 
 ## Growth Rate Fields
 
-Returned by `pokecli growth-rate get <name_or_id>`.
+Returned by `pokecli pokemon growth-rate get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -183,7 +183,7 @@ Determines the experience curve used to reach each level. There are 6 standard r
 
 ## Evolution Trigger Fields
 
-Returned by `pokecli evolution-trigger get <name_or_id>`.
+Returned by `pokecli pokemon evolution-trigger get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -194,7 +194,7 @@ Used in evolution chain definitions to describe how the evolution occurs.
 
 ## Move Damage Class Fields
 
-Returned by `pokecli move-damage-class get <name_or_id>`.
+Returned by `pokecli move damage-class get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -205,7 +205,7 @@ Returned by `pokecli move-damage-class get <name_or_id>`.
 
 ## Move Learn Method Fields
 
-Returned by `pokecli move-learn-method get <name_or_id>`.
+Returned by `pokecli move learn-method get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -216,7 +216,7 @@ Cross-referenced from `pokecli pokemon moves --method <name>`.
 
 ## Version Fields
 
-Returned by `pokecli version get <name_or_id>`.
+Returned by `pokecli game version get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -226,7 +226,7 @@ Returned by `pokecli version get <name_or_id>`.
 
 ## Version Group Fields
 
-Returned by `pokecli version-group get <name_or_id>`.
+Returned by `pokecli game version-group get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -239,7 +239,7 @@ Returned by `pokecli version-group get <name_or_id>`.
 
 ## Machine Fields
 
-Returned by `pokecli machine get <id>`.
+Returned by `pokecli game machine get <id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -252,7 +252,7 @@ The same move can be taught by different machine IDs across version groups.
 
 ## Pokemon Form Fields
 
-Returned by `pokecli pokemon-form get <name_or_id>`.
+Returned by `pokecli pokemon form get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -288,11 +288,11 @@ Returned by `pokecli pokemon forms <name_or_id>`. Sourced from the species `vari
 |-------|-------------|
 | Variety | The variety's pokemon slug (e.g. `charizard-mega-x`, `vulpix-alola`, `pikachu-gmax`) |
 | Default | `yes` for the species' default variety; empty otherwise |
-| Lookup URL | Direct PokeAPI URL; the slug feeds `pokecli pokemon-form get <variety>` |
+| Lookup URL | Direct PokeAPI URL; the slug feeds `pokecli pokemon form get <variety>` |
 
 ## Region Fields
 
-Returned by `pokecli region get <name_or_id>`.
+Returned by `pokecli game region get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -318,7 +318,7 @@ A `location` is a top-level place (city, route, dungeon). A `location-area` is a
 
 ## Location Area Fields
 
-Returned by `pokecli location-area get <name_or_id>`.
+Returned by `pokecli location area get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -332,7 +332,7 @@ The encounter table has one row per (pokemon, version, encounter_detail) tuple, 
 
 ## Generation Fields
 
-Returned by `pokecli generation get <name_or_id>`.
+Returned by `pokecli game generation get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -349,7 +349,7 @@ Returned by `pokecli generation get <name_or_id>`.
 
 ## Pokedex Fields
 
-Returned by `pokecli pokedex get <name_or_id>`.
+Returned by `pokecli game pokedex get <name_or_id>`.
 
 | Field | Description |
 |-------|-------------|
@@ -364,7 +364,7 @@ The `national` pokedex spans all generations; regional pokedexes are subsets.
 
 ## Evolution Chain Standalone
 
-Returned by `pokecli evolution-chain get <id>`. Renders identically to
+Returned by `pokecli pokemon evolution-chain get <id>`. Renders identically to
 `pokecli pokemon evolution`, but accepts a chain ID directly. Use this when the
 chain ID was extracted from another response (e.g. `pokemon species` returns
 `evolution_chain.url`, whose trailing path segment is the chain ID).
