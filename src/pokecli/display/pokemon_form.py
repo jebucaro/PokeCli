@@ -25,7 +25,7 @@ def render_pokemon_varieties(
         table.add_row(v["pokemon"]["name"], is_default, v["pokemon"]["url"])
     console.print(table)
     console.print(
-        "\n[dim]Inspect a variety with: pokecli pokemon-form get <variety-name>[/dim]"
+        "\n[dim]Inspect a variety with: pokecli pokemon form get <variety-name>[/dim]"
     )
 
 

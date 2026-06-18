@@ -1,4 +1,4 @@
-"""Smoke tests confirming new subcommands are wired into the root app and surface get/list."""
+"""Smoke tests confirming the grouped CLI surface is wired into the root app."""
 
 import pytest
 from typer.testing import CliRunner
@@ -7,35 +7,73 @@ from pokecli.main import app
 
 runner = CliRunner()
 
-NEW_COMMANDS = [
-    "egg-group",
-    "growth-rate",
-    "evolution-trigger",
-    "move-damage-class",
-    "move-learn-method",
-    "version",
-    "version-group",
-    "machine",
-    "pokemon-form",
-    "region",
+ROOT_COMMANDS = [
+    "pokemon",
+    "ability",
+    "move",
+    "item",
+    "type",
     "location",
-    "location-area",
-    "generation",
-    "pokedex",
-    "evolution-chain",
+    "game",
+    "image",
+    "cache",
 ]
 
 
-def test_root_help_lists_new_commands():
+def test_root_help_lists_primary_commands():
     result = runner.invoke(app, ["--help"])
     assert result.exit_code == 0
-    for cmd in NEW_COMMANDS:
+    for cmd in ROOT_COMMANDS:
         assert cmd in result.stdout, f"missing '{cmd}' in root --help"
+    assert "move-damage-class" not in result.stdout
+    assert "pokemon-form" not in result.stdout
 
 
-@pytest.mark.parametrize("cmd", NEW_COMMANDS)
-def test_subcommand_exposes_get_and_list(cmd):
+@pytest.mark.parametrize(
+    ("cmd", "expected"),
+    [
+        ("move", ["get", "list", "damage-class", "learn-method"]),
+        (
+            "pokemon",
+            ["get", "moves", "species", "evolution", "encounters", "form"],
+        ),
+        (
+            "game",
+            [
+                "generation",
+                "pokedex",
+                "region",
+                "version",
+                "version-group",
+                "machine",
+            ],
+        ),
+        ("location", ["get", "list", "area"]),
+    ],
+)
+def test_grouped_commands_expose_expected_subcommands(cmd, expected):
     result = runner.invoke(app, [cmd, "--help"])
     assert result.exit_code == 0, f"`{cmd} --help` failed: {result.output}"
-    assert "get" in result.stdout
-    assert "list" in result.stdout
+    for subcommand in expected:
+        assert subcommand in result.stdout
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        ["region", "--help"],
+        ["pokemon-form", "--help"],
+        ["move-damage-class", "--help"],
+    ],
+)
+def test_hidden_legacy_commands_still_work(cmd):
+    result = runner.invoke(app, cmd)
+    assert result.exit_code == 0, result.output
+
+
+def test_root_help_includes_examples():
+    result = runner.invoke(app, ["--help"])
+    assert result.exit_code == 0
+    assert "Examples:" in result.stdout
+    assert "pokecli pokemon pikachu" in result.stdout
+    assert "pokecli game region get kanto" in result.stdout

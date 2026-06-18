@@ -4,7 +4,7 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
-app = typer.Typer(help="Install pokecli integrations.")
+app = typer.Typer(help="Install pokecli agent skills.")
 console = Console()
 err_console = Console(stderr=True)
 
@@ -15,15 +15,15 @@ def install(
     skills: bool = typer.Option(
         False,
         "--skills",
-        help="Install Claude Code skills (use --local to target the current directory).",
+        help="Install the packaged pokecli skill files, use --local to target the current directory.",
     ),
     local: bool = typer.Option(
         False,
         "--local",
-        help="Install to .claude/skills/pokecli/ relative to the current directory.",
+        help="Install under .claude/skills/pokecli/ in the current directory.",
     ),
 ) -> None:
-    """Install pokecli integrations."""
+    """Install pokecli agent skills."""
     if not skills:
         console.print(ctx.get_help())
         raise typer.Exit()

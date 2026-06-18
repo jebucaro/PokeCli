@@ -5,6 +5,22 @@ from rich.console import Console
 from typing import Optional
 
 from pokecli.cache.store import CacheStore
+from pathlib import Path
+
+from pokecli.commands import egg_group, evolution_chain, evolution_trigger, growth_rate, image, pokemon_form
+from pokecli.commands._group import ResourceGroup
+from pokecli.commands._helptext import (
+    FORMAT,
+    LIMIT,
+    METHOD_FILTER,
+    MOVE_FILTER,
+    MOVE_NAME,
+    NO_CACHE,
+    OFFSET,
+    OUTPUT_PATH,
+    POKEMON_NAME_OR_ID,
+    SPRITE_VARIANT,
+)
 from pokecli.commands._utils import fetch_list, fetch_resource
 from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
 from pokecli.display.common import render_json, render_list
@@ -15,7 +31,18 @@ from pokecli.display.pokemon_form import render_pokemon_varieties
 from pokecli.models.evolution import EvolutionChain, PokemonSpecies
 from pokecli.models.pokemon import Pokemon, PokemonMoveEntry
 
-app = typer.Typer(help="Search and browse Pokemon.")
+app = typer.Typer(
+    help="Look up Pokemon, evolutions, encounters, moves, and forms.",
+    cls=ResourceGroup,
+    epilog=(
+        "Examples:\n"
+        "  pokecli pokemon pikachu\n"
+        "  pokecli pokemon can-learn pikachu thunderbolt\n"
+        "  pokecli pokemon where pikachu\n"
+        "  pokecli pokemon form get charizard-mega-x\n"
+        "  pokecli pokemon image pikachu -o pikachu.png"
+    ),
+)
 console = Console()
 err_console = Console(stderr=True)
 
@@ -23,13 +50,11 @@ err_console = Console(stderr=True)
 @app.command()
 def get(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
 ) -> None:
-    """Get detailed information about a Pokemon."""
+    """Show a Pokemon's main profile, stats, types, and abilities."""
     client = ctx.obj["client"]
     data = fetch_resource(client, "pokemon", name_or_id, no_cache, err_console)
     try:
@@ -69,21 +94,17 @@ def _extract_moves(raw_moves: list[dict]) -> list[PokemonMoveEntry]:
 @app.command()
 def moves(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
-    move: Optional[str] = typer.Option(
-        None, "--move", help="Filter to a specific move name"
-    ),
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
+    move: Optional[str] = typer.Option(None, "--move", help=MOVE_FILTER),
     method: Optional[str] = typer.Option(
         None,
         "--method",
-        help="Filter by learn method: level-up, machine, tutor, egg",
+        help=METHOD_FILTER,
     ),
 ) -> None:
-    """List all moves a Pokemon can learn."""
+    """Show the moves a Pokemon can learn."""
     client = ctx.obj["client"]
     data = fetch_resource(client, "pokemon", name_or_id, no_cache, err_console)
     pokemon_name = data["name"]
@@ -137,13 +158,11 @@ def moves(
 @app.command()
 def species(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
 ) -> None:
-    """Get species data for a Pokemon (Pokedex entry, egg groups, capture rate, etc.)."""
+    """Show Pokedex entry, egg groups, capture rate, and species details."""
     client = ctx.obj["client"]
     data = fetch_resource(client, "pokemon-species", name_or_id, no_cache, err_console)
     try:
@@ -160,11 +179,9 @@ def species(
 @app.command()
 def evolution(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
 ) -> None:
     """Show the full evolution chain for a Pokemon."""
     client = ctx.obj["client"]
@@ -206,15 +223,14 @@ def evolution(
 @app.command()
 def encounters(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
 ) -> None:
-    """Show where a Pokemon can be encountered in the wild."""
+    """Show where a Pokemon appears in the wild."""
     client = ctx.obj["client"]
     # Resolve identifier to canonical pokemon name (handles ID input)
-    data = fetch_resource(client, "pokemon", name_or_id, False, err_console)
+    data = fetch_resource(client, "pokemon", name_or_id, no_cache, err_console)
     pokemon_name = data["name"]
     try:
         result = client.get_subresource("pokemon", pokemon_name, "encounters")
@@ -232,15 +248,80 @@ def encounters(
 
 
 @app.command()
-def forms(
+def where(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon name or Pokedex number"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
+) -> None:
+    """Quick shortcut for catch location lookups."""
+    encounters(ctx, name_or_id=name_or_id, no_cache=no_cache, format=format)
+
+
+@app.command(name="image")
+def image_cmd(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    output: Path = typer.Option(..., "--output", "-o", help=OUTPUT_PATH),
+    variant: str = typer.Option(
+        "front_default",
+        "--variant",
+        help=SPRITE_VARIANT,
     ),
 ) -> None:
-    """List all varieties of a Pokemon species (Mega, Alolan, Gigantamax, etc.)."""
+    """Download a sprite without leaving the Pokemon command."""
+    image.download(
+        ctx,
+        resource="pokemon",
+        name_or_id=name_or_id,
+        output=output,
+        variant=variant,
+    )
+
+
+@app.command(name="can-learn")
+def can_learn(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    move_name: str = typer.Argument(..., help=MOVE_NAME),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
+    method: Optional[str] = typer.Option(
+        None,
+        "--method",
+        help=METHOD_FILTER,
+    ),
+) -> None:
+    """Check whether a Pokemon can learn a move."""
+    moves(
+        ctx,
+        name_or_id=name_or_id,
+        no_cache=no_cache,
+        format=format,
+        move=move_name,
+        method=method,
+    )
+
+
+@app.command()
+def evo(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
+) -> None:
+    """Quick shortcut for evolution lookups."""
+    evolution(ctx, name_or_id=name_or_id, no_cache=no_cache, format=format)
+
+
+@app.command()
+def forms(
+    ctx: typer.Context,
+    name_or_id: str = typer.Argument(..., help=POKEMON_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
+) -> None:
+    """Show a species' varieties, like Mega, Alolan, or Gigantamax forms."""
     client = ctx.obj["client"]
     species_data = fetch_resource(
         client, "pokemon-species", name_or_id, no_cache, err_console
@@ -258,9 +339,16 @@ def forms(
 @app.command(name="list")
 def list_pokemon(
     ctx: typer.Context,
-    limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help="Number of results"),
-    offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help="Pagination offset"),
+    limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help=LIMIT),
+    offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help=OFFSET),
 ) -> None:
-    """List Pokemon with pagination."""
+    """Browse Pokemon with pagination."""
     client = ctx.obj["client"]
     render_list(fetch_list(client, "pokemon", limit, offset, err_console), console)
+
+
+app.add_typer(pokemon_form.app, name="form")
+app.add_typer(egg_group.app, name="egg-group")
+app.add_typer(growth_rate.app, name="growth-rate")
+app.add_typer(evolution_trigger.app, name="evolution-trigger")
+app.add_typer(evolution_chain.app, name="evolution-chain")

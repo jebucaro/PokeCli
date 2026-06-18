@@ -2,6 +2,8 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
+from pokecli.commands._group import ResourceGroup
+from pokecli.commands._helptext import FORMAT, FORM_NAME_OR_ID, LIMIT, NO_CACHE, OFFSET
 from pokecli.commands._utils import fetch_list, fetch_resource
 from pokecli.config import DEFAULT_LIMIT, DEFAULT_OFFSET
 from pokecli.display.common import render_json, render_list
@@ -9,7 +11,8 @@ from pokecli.display.pokemon_form import render_pokemon_form
 from pokecli.models.pokemon_form import PokemonForm
 
 app = typer.Typer(
-    help="Search and browse Pokemon Forms (Mega, Alolan, Gigantamax, etc.)."
+    help="Inspect special forms like Mega, Alolan, and Gigantamax variants.",
+    cls=ResourceGroup,
 )
 console = Console()
 err_console = Console(stderr=True)
@@ -18,13 +21,11 @@ err_console = Console(stderr=True)
 @app.command()
 def get(
     ctx: typer.Context,
-    name_or_id: str = typer.Argument(..., help="Pokemon form name or ID"),
-    no_cache: bool = typer.Option(False, "--no-cache", help="Skip local cache"),
-    format: str = typer.Option(
-        "table", "--format", help="Output format: table or json"
-    ),
+    name_or_id: str = typer.Argument(..., help=FORM_NAME_OR_ID),
+    no_cache: bool = typer.Option(False, "--no-cache", help=NO_CACHE),
+    format: str = typer.Option("table", "--format", help=FORMAT),
 ) -> None:
-    """Get details about a Pokemon Form."""
+    """Show details for one specific Pokemon form."""
     client = ctx.obj["client"]
     data = fetch_resource(client, "pokemon-form", name_or_id, no_cache, err_console)
     try:
@@ -41,9 +42,9 @@ def get(
 @app.command(name="list")
 def list_pokemon_forms(
     ctx: typer.Context,
-    limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help="Number of results"),
-    offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help="Pagination offset"),
+    limit: int = typer.Option(DEFAULT_LIMIT, "--limit", help=LIMIT),
+    offset: int = typer.Option(DEFAULT_OFFSET, "--offset", help=OFFSET),
 ) -> None:
-    """List Pokemon Forms with pagination."""
+    """Browse Pokemon forms with pagination."""
     client = ctx.obj["client"]
     render_list(fetch_list(client, "pokemon-form", limit, offset, err_console), console)
