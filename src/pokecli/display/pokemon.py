@@ -59,7 +59,7 @@ def render_pokemon(pokemon: Pokemon, console: Console) -> None:
         if pa.is_hidden:
             label += " [dim](hidden)[/dim]"
         ability_parts.append(label)
-    abilities_line = "  ·  ".join(ability_parts)
+    abilities_line = f"  {get_chars(console).bullet}  ".join(ability_parts)
 
     # Sprites
     sprites = pokemon.sprites

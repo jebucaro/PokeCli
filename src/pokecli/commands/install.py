@@ -4,6 +4,8 @@ from pathlib import Path
 import typer
 from rich.console import Console
 
+from pokecli.display.common import uses_unicode
+
 app = typer.Typer(help="Install pokecli agent skills.")
 console = Console()
 err_console = Console(stderr=True)
@@ -47,4 +49,5 @@ def install(
         )
         (refs_dir / ref_name).write_text(content, encoding="utf-8")
 
-    console.print(f"[green]✓ Skills installed to {dest_dir}[/green]")
+    marker = "✓" if uses_unicode(console) else "[OK]"
+    console.print(f"[green]{marker} Skills installed to {dest_dir}[/green]")
