@@ -79,19 +79,32 @@ pokecli game pokedex get kanto --format json \
 
 ## Which TM teaches a move?
 
-Start with the move:
+pokecli has no move-to-machine index. `game machine get <id>` only works once you already
+have the numeric ID; `move get` and `pokemon moves` never surface it:
 
 ```bash
 pokecli move get thunderbolt
 ```
 
-Then inspect one machine ID:
+Do not try to reconstruct the mapping by guessing machine IDs across generations or by
+querying the PokeAPI directly outside pokecli — that burns many round trips for an answer
+that's still likely wrong, and it defeats the point of using the CLI.
+
+If the user already has a machine ID or TM/TR number (from an in-game label, a previous
+lookup, etc.), look it up directly:
 
 ```bash
 pokecli game machine get 79
 ```
 
-Cross-reference with Pokemon learnability:
+Otherwise, tell the user pokecli can't resolve a move name to its TM/machine number on its
+own, and offer to browse instead (paginated, 20 per page):
+
+```bash
+pokecli game machine list
+```
+
+Cross-referencing learnability only needs the move name, not a machine ID:
 
 ```bash
 pokecli pokemon can-learn charizard thunderbolt --method machine
