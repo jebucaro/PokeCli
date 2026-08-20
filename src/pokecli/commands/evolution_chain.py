@@ -14,7 +14,7 @@ console = Console()
 err_console = Console(stderr=True)
 
 
-def _render_get_toon(chain: EvolutionChain, console: Console) -> None:
+def _render_get_toon(chain: EvolutionChain, _console: Console) -> None:
     """Render an evolution chain in TOON format with hints."""
     from pokecli.display.toon import toon_tree, print_toon
     from pokecli.display.toon_schemas import evolution_chain_toon

@@ -201,7 +201,7 @@ def _render_moves_toon(
     pokemon_name: str,
     pokemon_moves: list[PokemonMoveEntry],
     hints: list[str],
-    console: Console,
+    _console: Console,
 ) -> None:
     """Render moves in TOON format with hints."""
     from collections import Counter
@@ -368,7 +368,7 @@ def evolution(
 
 
 def _render_encounters_toon(
-    pokemon_name: str, result: list, console: Console
+    pokemon_name: str, result: list, _console: Console
 ) -> None:
     """Render encounters in TOON format with hints."""
     from pokecli.display.toon import toon_list, toon_kv, print_toon
