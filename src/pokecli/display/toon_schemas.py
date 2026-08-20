@@ -32,11 +32,22 @@ def _safe(value: object) -> str | None:
 def pokemon_toon(pokemon: Pokemon) -> list[tuple[str, str | None]]:
     """Transform a Pokemon into TOON fields.
 
-    Returns fields: id, name, types, abilities, stats (as hp/atk/def/spa/spd/spe)
+    Returns fields: id, name, types, abilities, stats (labeled as hp/atk/def/spa/spd/spe)
     """
     types = "/".join(t.type.name for t in pokemon.types)
-    abilities = "/".join(a.ability.name for a in pokemon.abilities)
-    stats = "/".join(str(s.base_stat) for s in pokemon.stats)
+
+    ability_parts = []
+    for a in pokemon.abilities:
+        label = a.ability.name
+        if a.is_hidden:
+            label += "(H)"
+        ability_parts.append(label)
+    abilities = "/".join(ability_parts)
+
+    stat_labels = ("hp", "atk", "def", "spa", "spd", "spe")
+    stats = "/".join(
+        f"{label}:{s.base_stat}" for label, s in zip(stat_labels, pokemon.stats)
+    )
 
     return [
         ("id", str(pokemon.id)),

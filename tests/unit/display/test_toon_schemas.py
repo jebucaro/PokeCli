@@ -74,8 +74,8 @@ class TestPokemonToon:
         assert fields_dict["id"] == "25"
         assert fields_dict["name"] == "pikachu"
         assert fields_dict["types"] == "electric"
-        assert fields_dict["abilities"] == "static/lightning-rod"
-        assert fields_dict["stats"] == "35/55/40/50/50/90"
+        assert fields_dict["abilities"] == "static/lightning-rod(H)"
+        assert fields_dict["stats"] == "hp:35/atk:55/def:40/spa:50/spd:50/spe:90"
 
     def test_multiple_types(self):
         pokemon = Pokemon(
